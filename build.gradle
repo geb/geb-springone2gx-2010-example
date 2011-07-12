@@ -6,21 +6,35 @@ repositories {
 	mavenCentral()
 }
 
+// The drivers we want to use
+drivers = ["firefox", "chrome"]
+
 dependencies {
 	groovy "org.codehaus.groovy:groovy-all:1.7.5"
+	
+	def gebVersion = "0.6.0"
+	def seleniumVersion = "2.0rc3"
+	
+	testCompile "org.codehaus.geb:geb-spock:$gebVersion"
 	testCompile "org.spockframework:spock-core:0.5-groovy-1.7"
-
-	// Need Geb Spock (pulls in geb-core)
-	testCompile "org.codehaus.geb:geb-spock:0.6.0"
-
-	// Need some drivers
-	testCompile "org.seleniumhq.selenium:selenium-firefox-driver:2.0rc2"
+		
+	drivers.each { driver ->
+		testCompile "org.seleniumhq.selenium:selenium-$driver-driver:$seleniumVersion"
+	}
 }
 
-test {
-    systemProperty "geb.build.baseUrl", "http://www.springone2gx.com/conference/chicago/2010/10/home"
-	systemProperty "geb.build.reportsDir", "$reportsDir/geb"
+drivers.each { driver ->
+	task "${driver}Test"(type: Test) {
+		testReportDir = file("$reportsDir/$name/tests")
+		testResultsDir = file("$buildDir/test-results/$name")
+		
+		systemProperty "geb.build.baseUrl", "http://www.springone2gx.com/conference/chicago/2010/10/home"
+		systemProperty "geb.build.reportsDir", "$reportsDir/$name/geb"
+		systemProperty "geb.env", driver
+	}
 }
+
+task test(overwrite: true, dependsOn: drivers.collect { tasks["${it}Test"] })
 
 task wrapper(type: Wrapper) {
     gradleVersion = '1.0-milestone-3'

@@ -4,7 +4,7 @@ import geb.*
 
 class ContactUsPage extends BasePage {
 
-	static at = { pageName == "Contact Us" }
+	static at = { assert pageName == "CONTACT US"; true }
 
 	static content = {
 		// Not required because there may not be an error message

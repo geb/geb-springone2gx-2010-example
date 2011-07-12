@@ -1,12 +1,12 @@
 import spock.lang.Stepwise
-
+import geb.spock.GebReportingSpec
 import org.openqa.selenium.Keys
 
 import pages.FrontPage
 import pages.ContactUsPage
 
 @Stepwise
-class ContactUsFormSpec extends BaseSpec {
+class ContactUsFormSpec extends GebReportingSpec {
 	def "at the front page"() {
 		when:
 		to FrontPage
@@ -65,22 +65,23 @@ class ContactUsFormSpec extends BaseSpec {
 
 		then: "I can't get past the captcha"
 		at ContactUsPage
-		errorMessage == "Image verification failed" 
+		errorMessage == "Verification failed" 
 	}
 	
 	def "demo the keyboard event api"() {
 		when:
 		// Can send characters to elements
-		feedbackMessage() << "1" << "2" << "3" << "4" << "5"
+		feedbackMessage = "123"
+		feedbackMessage() << "4" << "5"
 		
 		then:
 		// Can read form elements values by name
-		feedbackMessage == "12345"
+		feedbackMessage().firstElement().value == "12345"
 		
 		when:
 		feedbackMessage() << Keys.BACK_SPACE << Keys.BACK_SPACE // can use webdriver API for sending "exotic" keys
 		
 		then:
-		feedbackMessage == "123"
+		feedbackMessage().firstElement().value == "123"
 	}   
 }

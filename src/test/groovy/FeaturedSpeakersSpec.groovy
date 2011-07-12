@@ -1,45 +1,45 @@
 import geb.error.RequiredPageContentNotPresent
-
+import geb.spock.GebReportingSpec
 import pages.FrontPage
 import pages.SpeakerPage
 
-class FeaturedSpeakersSpec extends BaseSpec {
+class FeaturedSpeakersSpec extends GebReportingSpec {
 	def setup() {
 		to FrontPage
 	}
 	
 	def "Rod should be the first featured speaker"() {
 		expect:
-		springOneSpeakers.speakerAtPosition(0, 0).name == "Rod Johnson"
+		springOneSpeakers.speakerAtIndex(0).name == "Rod Johnson"
 	}
 
 	def "test some more speaker positions"() {
 		when:
 		def speakers = page."${group}Speakers"
-		def speaker = speakers.speakerAtPosition(row, column)
+		def speaker = speakers.speakerAtIndex(index)
 		
 		then:
 		speaker.name == name
 		
 		where:
-		name           | group       | row | column
-		"Rod Johnson"  | "springOne" | 0   | 0  
-		"Hans Dockter" | "twoGx"     | 1   | 1
-		"Keith Donald" | "springOne" | 1   | 2
-		"Jeff Brown"   | "twoGx"     | 0   | 2
+		name           | group       | index
+		"Rod Johnson"  | "springOne" | 0
+		"Hans Dockter" | "twoGx"     | 3
+		"Keith Donald" | "springOne" | 4
+		"Jeff Brown"   | "twoGx"     | 2
 	}
 	
-	def "each group of speakers should contain six"() {
+	def "count the speakers"() {
 		expect:
-		springOneSpeakers.find("div.speaker").size() == 6
+		springOneSpeakers.find("li").size() == 5
 
 		and:
-		twoGxSpeakers.find("div.speaker").size() == 6
+		twoGxSpeakers.find("li").size() == 5
 	}
 	
 	def "speaker links should take you to the speaker page for that speaker"() {
 		given:
-		def speaker = "Juergen Hoeller"
+		def speaker = "JUERGEN HOELLER"
 
 		when:
 		springOneSpeakers.speakerByName(speaker).nameLink.click()
@@ -51,10 +51,12 @@ class FeaturedSpeakersSpec extends BaseSpec {
 		speakerName == speaker
 	}
 	
-	def "the speaker image on the front page should be the same image that is used on their profile page"() {
+	def "the speaker image should be fore the speaker"() {
 		given:
 		def speaker = twoGxSpeakers.speakerByName("Graeme")
-		def frontPagePictureSrc = speaker.picture.@src // use attribute notation to get tag attributes
+		
+		expect:
+		speaker.picture.@src.contains("5144_Rocher") // use attribute notation to get tag attributes
 
 		when:
 		speaker.picture.click() // get there via the picture
@@ -63,7 +65,7 @@ class FeaturedSpeakersSpec extends BaseSpec {
 		at SpeakerPage
 		
 		and:
-		frontPagePictureSrc == $("img.speaker").@src // can also use $() in tests for ad hoc
+		$("img.speaker").@src.contains("5144_Rocher") // can also use $() in tests for ad hoc
 	}
 	
 	def "accessing content that doesn't exist throws an exception"() {

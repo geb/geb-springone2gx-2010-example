@@ -1,6 +1,6 @@
 package pages
 
-class SpeakerPage extends MainPage {
+class SpeakerPage extends BasePage {
 
 	// If the title contains 'Biography', we are at a speaker page
 	static at = { title.contains("Biography") }

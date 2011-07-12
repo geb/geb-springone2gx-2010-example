@@ -1,57 +1,27 @@
-apply plugin: "groovy"      
-apply plugin: "org.gradle.idea"    
+apply plugin: "groovy"
+apply plugin: "idea"
 apply plugin: "eclipse"
-       
-buildscript {
-	repositories {
-		mavenRepo urls: "http://gradle.artifactoryonline.com/gradle/plugins"
-		mavenCentral()
-	}
-	dependencies {
-		classpath "org.gradle.plugins:gradle-idea-plugin:0.2"
-	}
-}
 
 repositories {
 	mavenCentral()
-
-	// Spock
-	mavenRepo urls: "http://m2repo.spockframework.org/snapshots"
-	
-	// Geb
-	mavenRepo urls: "http://snapshots.repository.codehaus.org"     
-}
-
-configurations {
-	testCompile.transitive = true
 }
 
 dependencies {
 	groovy "org.codehaus.groovy:groovy-all:1.7.5"
-	testCompile "org.spockframework:spock-core:0.5-groovy-1.7-SNAPSHOT"
+	testCompile "org.spockframework:spock-core:0.5-groovy-1.7"
 
 	// Need Geb Spock (pulls in geb-core)
-	testCompile "org.codehaus.geb:geb-spock:0.5-SNAPSHOT"
-	
+	testCompile "org.codehaus.geb:geb-spock:0.6.0"
+
 	// Need some drivers
-	testCompile "org.seleniumhq.selenium:selenium-firefox-driver:2.0a5"
-	testCompile "org.seleniumhq.selenium:selenium-htmlunit-driver:2.0a5"    
-	
-        
+	testCompile "org.seleniumhq.selenium:selenium-firefox-driver:2.0rc2"
 }
 
-// To use htmlunit invoke with -Pdriver=htmlunit (note that some of the tests will fail with htmlunit)
 test {
-	systemProperties['geb.driver'] = project.hasProperty("driver") ? project.driver : 'firefox'
+    systemProperty "geb.build.baseUrl", "http://www.springone2gx.com/conference/chicago/2010/10/home"
+	systemProperty "geb.build.reportsDir", "$reportsDir/geb"
 }
-
-// Run a single spec by -Pt=«spec name»
-if (project.hasProperty('t')) {
-	test.doFirst {
-		test.include "**/${t}*.class"
-	}
-}   
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '0.9-rc-1'
+    gradleVersion = '1.0-milestone-3'
 }
